@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/pc_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PC ID:"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <CheckBox
+            android:id="@+id/checkbox_virus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Virus Check Completed" />
+
+        <CheckBox
+            android:id="@+id/checkbox_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Software Updated" />
+
+        <CheckBox
+            android:id="@+id/checkbox_uninstall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Unnecessary Programs Uninstalled" />
+
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Status: Loading..."
+            android:layout_marginTop="20dp"
+            android:textSize="16sp"
+            android:textStyle="italic" />
+
+        <TextView
+            android:id="@+id/last_updated_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Last Updated:"
+            android:layout_marginTop="10dp"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/submit_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit Maintenance"
+            android:layout_marginTop="30dp" />
+    </LinearLayout>
+</ScrollView>

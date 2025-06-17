@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "835598234715",
+    "project_id": "dtcinventorysystem",
+    "storage_bucket": "dtcinventorysystem.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835598234715:android:8f023f979edd55ef773b7e",
+        "android_client_info": {
+          "package_name": "com.example.dtcinventorysystem"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANZU2MJi2UTyjMibtxem8rOH-8ZacKMbU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
