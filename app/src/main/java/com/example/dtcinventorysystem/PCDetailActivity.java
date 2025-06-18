@@ -1,111 +1,294 @@
 package com.example.dtcinventorysystem;
 
+import android.app.DatePickerDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
+import androidx.core.content.ContextCompat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 public class PCDetailActivity extends AppCompatActivity {
-    CheckBox virusCheck, updateSoftware, uninstallPrograms;
-    Button submitBtn;
-    TextView pcNameText, statusText, lastUpdatedText;
-    DatabaseReference pcRef;
+
+    // UI Components
+    private TextView pcIdText;
+    private EditText pcNameInput, pcSpecsInput, dateAcquiredInput;
+    private TextView lastMaintainedDisplay;
+    private CheckBox checkboxVirus, checkboxUninstall, checkboxUpdate;
+    private ImageView virusCheckIcon, uninstallIcon, updateIcon;
+    private TextView performedByText, maintenanceDateText;
+    private TextView statusText, lastUpdatedText, maintainerText, diagnosticsText;
+    private Button updateBtn, addNewItemBtn;
+
+    // User data
+    private String currentUser = ""; // Will be set based on login
+    private String userRole = ""; // "admin" or "maintainer"
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pcdetail);
 
-        virusCheck = findViewById(R.id.checkbox_virus);
-        updateSoftware = findViewById(R.id.checkbox_update);
-        uninstallPrograms = findViewById(R.id.checkbox_uninstall);
-        submitBtn = findViewById(R.id.submit_btn);
-        pcNameText = findViewById(R.id.pc_name);
+        initializeViews();
+        setupUserData();
+        loadSavedData();
+        setupDatePickers();
+        setupCheckboxListeners();
+        setupButtons();
+        updateMaintenanceStatus();
+    }
+
+    private void initializeViews() {
+        pcIdText = findViewById(R.id.pc_id_text);
+        pcNameInput = findViewById(R.id.pc_name_input);
+        pcSpecsInput = findViewById(R.id.pc_specs_input);
+        dateAcquiredInput = findViewById(R.id.date_acquired_input);
+        lastMaintainedDisplay = findViewById(R.id.last_maintained_display);
+
+        checkboxVirus = findViewById(R.id.checkbox_virus);
+        checkboxUninstall = findViewById(R.id.checkbox_uninstall);
+        checkboxUpdate = findViewById(R.id.checkbox_update);
+
+        virusCheckIcon = findViewById(R.id.virus_check_icon);
+        uninstallIcon = findViewById(R.id.uninstall_icon);
+        updateIcon = findViewById(R.id.update_icon);
+
+        performedByText = findViewById(R.id.performed_by_text);
+        maintenanceDateText = findViewById(R.id.maintenance_date_text);
+
         statusText = findViewById(R.id.status_text);
         lastUpdatedText = findViewById(R.id.last_updated_text);
+        maintainerText = findViewById(R.id.maintainer_text);
+        diagnosticsText = findViewById(R.id.diagnostics_text);
 
-        String pcId = getIntent().getStringExtra("pc_id");
-        String role = getIntent().getStringExtra("role");
-        pcRef = FirebaseDatabase.getInstance().getReference("pcs").child(pcId);
+        updateBtn = findViewById(R.id.update_btn);
+        addNewItemBtn = findViewById(R.id.add_new_item_btn);
 
-        pcNameText.setText("PC ID: " + pcId);
+        preferences = getSharedPreferences("PCMaintenance", MODE_PRIVATE);
+    }
 
-        // Load existing data
-        pcRef.get().addOnSuccessListener(snapshot -> {
-            if (snapshot.exists()) {
-                Boolean virus = snapshot.child("virusCheck").getValue(Boolean.class);
-                Boolean update = snapshot.child("updateSoftware").getValue(Boolean.class);
-                Boolean uninstall = snapshot.child("uninstallPrograms").getValue(Boolean.class);
-                String status = snapshot.child("status").getValue(String.class);
-                Long lastUpdated = snapshot.child("lastUpdated").getValue(Long.class);
+    private void setupUserData() {
+        // In a real app, this would come from login/authentication
+        // For demo purposes, you can set these values or get from Intent
+        currentUser = getIntent().getStringExtra("username");
+        userRole = getIntent().getStringExtra("user_role");
 
-                virusCheck.setChecked(Boolean.TRUE.equals(virus));
-                updateSoftware.setChecked(Boolean.TRUE.equals(update));
-                uninstallPrograms.setChecked(Boolean.TRUE.equals(uninstall));
+        // Default values for testing
+        if (currentUser == null) currentUser = "Maintainer245";
+        if (userRole == null) userRole = "maintainer";
+    }
 
-                if (status != null) {
-                    statusText.setText("Status: " + status);
-                } else {
-                    statusText.setText("Status: Unknown");
-                }
+    private void loadSavedData() {
+        // Load saved PC data
+        pcNameInput.setText(preferences.getString("pc_name", "COM77-17"));
+        pcSpecsInput.setText(preferences.getString("pc_specs", "PC-110 Intel Core i7-6700 Processor 3.4 GHz"));
+        dateAcquiredInput.setText(preferences.getString("date_acquired", "February 24, 2017"));
 
-                if (lastUpdated != null) {
-                    String formattedTime = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()).format(new Date(lastUpdated));
-                    lastUpdatedText.setText("Last Updated: " + formattedTime);
-                } else {
-                    lastUpdatedText.setText("Last Updated: Not available");
+        // Load maintenance status
+        checkboxVirus.setChecked(preferences.getBoolean("virus_check", true));
+        checkboxUninstall.setChecked(preferences.getBoolean("uninstall_programs", false));
+        checkboxUpdate.setChecked(preferences.getBoolean("update_software", false));
+
+        // Load maintenance info
+        String lastMaintainer = preferences.getString("last_maintainer", currentUser);
+        String lastMaintenanceDate = preferences.getString("last_maintenance_date", dateFormat.format(new Date()));
+
+        lastMaintainedDisplay.setText(lastMaintenanceDate);
+        maintainerText.setText("Last maintained by: " + lastMaintainer);
+        lastUpdatedText.setText("Last Updated: " + lastMaintenanceDate);
+    }
+
+    private void setupDatePickers() {
+        dateAcquiredInput.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePicker(dateAcquiredInput);
+            }
+        });
+    }
+
+    private void showDatePicker(final EditText editText) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        Calendar selectedDate = Calendar.getInstance();
+                        selectedDate.set(year, month, dayOfMonth);
+                        editText.setText(dateFormat.format(selectedDate.getTime()));
+                    }
+                }, year, month, day);
+        datePickerDialog.show();
+    }
+
+    private void setupCheckboxListeners() {
+        checkboxVirus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateTaskIcon(virusCheckIcon, isChecked);
+                if (isChecked) {
+                    updateMaintenanceInfo("virus_check");
                 }
             }
         });
 
-        // Disable for admin
-        if ("admin".equalsIgnoreCase(role)) {
-            virusCheck.setEnabled(false);
-            updateSoftware.setEnabled(false);
-            uninstallPrograms.setEnabled(false);
-            submitBtn.setEnabled(false);
+        checkboxUninstall.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateTaskIcon(uninstallIcon, isChecked);
+                if (isChecked) {
+                    updateMaintenanceInfo("uninstall_programs");
+                }
+            }
+        });
+
+        checkboxUpdate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateTaskIcon(updateIcon, isChecked);
+                if (isChecked) {
+                    updateMaintenanceInfo("update_software");
+                }
+            }
+        });
+    }
+
+    private void updateTaskIcon(ImageView icon, boolean isCompleted) {
+        if (isCompleted) {
+            icon.setImageResource(R.drawable.ic_check_circle);
+            icon.setColorFilter(ContextCompat.getColor(this, android.R.color.holo_green_dark));
+        } else {
+            icon.setImageResource(R.drawable.ic_close_circle);
+            icon.setColorFilter(ContextCompat.getColor(this, android.R.color.holo_red_dark));
+        }
+    }
+
+    private void updateMaintenanceInfo(String taskType) {
+        String currentDate = dateFormat.format(new Date());
+
+        // Update the maintenance info display
+        performedByText.setText("Performed by: " + currentUser);
+        maintenanceDateText.setText("Date: " + currentDate);
+        lastMaintainedDisplay.setText(currentDate);
+        lastUpdatedText.setText("Last Updated: " + currentDate);
+        maintainerText.setText("Last maintained by: " + currentUser);
+
+        // Update overall status
+        updateMaintenanceStatus();
+
+        // Show notification
+        Toast.makeText(this, "Task updated by " + currentUser, Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateMaintenanceStatus() {
+        boolean allTasksComplete = checkboxVirus.isChecked() &&
+                checkboxUninstall.isChecked() &&
+                checkboxUpdate.isChecked();
+
+        if (allTasksComplete) {
+            statusText.setText("Status: Fully Maintained");
+            statusText.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
+            diagnosticsText.setText("Diagnostics: All systems operational - All maintenance tasks completed");
+        } else {
+            statusText.setText("Status: Partial Maintenance");
+            statusText.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_dark));
+            diagnosticsText.setText("Diagnostics: Some maintenance tasks pending");
         }
 
-        submitBtn.setOnClickListener(v -> {
-            Map<String, Object> updates = new HashMap<>();
-            boolean virus = virusCheck.isChecked();
-            boolean update = updateSoftware.isChecked();
-            boolean uninstall = uninstallPrograms.isChecked();
+        // Update icons based on current status
+        updateTaskIcon(virusCheckIcon, checkboxVirus.isChecked());
+        updateTaskIcon(uninstallIcon, checkboxUninstall.isChecked());
+        updateTaskIcon(updateIcon, checkboxUpdate.isChecked());
+    }
 
-            updates.put("virusCheck", virus);
-            updates.put("updateSoftware", update);
-            updates.put("uninstallPrograms", uninstall);
-
-            // Compute status based on checks
-            String newStatus;
-            if (virus && update && uninstall) {
-                newStatus = "Done";
-            } else {
-                newStatus = "Under Maintenance";
+    private void setupButtons() {
+        updateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveAllData();
+                showUpdateConfirmation();
             }
-
-            updates.put("status", newStatus);
-            updates.put("lastUpdated", System.currentTimeMillis());
-
-            pcRef.updateChildren(updates).addOnSuccessListener(task -> {
-                Toast.makeText(this, "Maintenance status updated.", Toast.LENGTH_SHORT).show();
-                statusText.setText("Status: " + newStatus);
-                String formattedTime = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()).format(new Date());
-                lastUpdatedText.setText("Last Updated: " + formattedTime);
-            });
         });
+
+        addNewItemBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAddNewItemDialog();
+            }
+        });
+    }
+
+    private void saveAllData() {
+        SharedPreferences.Editor editor = preferences.edit();
+
+        // Save PC information
+        editor.putString("pc_name", pcNameInput.getText().toString());
+        editor.putString("pc_specs", pcSpecsInput.getText().toString());
+        editor.putString("date_acquired", dateAcquiredInput.getText().toString());
+
+        // Save maintenance status
+        editor.putBoolean("virus_check", checkboxVirus.isChecked());
+        editor.putBoolean("uninstall_programs", checkboxUninstall.isChecked());
+        editor.putBoolean("update_software", checkboxUpdate.isChecked());
+
+        // Save maintenance info
+        editor.putString("last_maintainer", currentUser);
+        editor.putString("last_maintenance_date", dateFormat.format(new Date()));
+
+        editor.apply();
+    }
+
+    private void showUpdateConfirmation() {
+        String message = "PC maintenance record updated successfully!\n\n" +
+                "Updated by: " + currentUser + " (" + userRole + ")\n" +
+                "Date: " + dateFormat.format(new Date());
+
+        new AlertDialog.Builder(this)
+                .setTitle("Update Successful")
+                .setMessage(message)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+    private void showAddNewItemDialog() {
+        // Check user permissions
+        if (!userRole.equals("admin")) {
+            Toast.makeText(this, "Only administrators can add new items", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Add New PC")
+                .setMessage("Do you want to add a new PC to the maintenance system?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // In a real app, this would navigate to a new PC entry form
+                    Toast.makeText(this, "Navigate to Add New PC form", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveAllData(); // Auto-save when leaving the activity
     }
 }

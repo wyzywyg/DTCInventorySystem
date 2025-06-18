@@ -1,29 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scannerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <!-- Camera Preview View -->
+    <!-- Camera Preview -->
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true" />
+        android:layout_height="match_parent" />
 
-    <!-- Scanning Status Label -->
-    <TextView
-        android:id="@+id/scanningStatus"
-        android:layout_width="wrap_content"
+    <!-- Overlay with scanning frame -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+         />
+
+    <!-- Top Status Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Scanning for QR code..."
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:background="#66000000"
-        android:padding="10dp"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/scanningStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Point camera at PC QR code to scan"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+        <!-- Scanned Data Display -->
+        <TextView
+            android:id="@+id/scannedDataDisplay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+
+            android:padding="12dp"
+            android:text=""
+            android:textColor="#00FF00"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <!-- Bottom Instructions -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="32dp" />
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📱 Align QR code within the frame"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔍 Keep steady until scan completes"
+            android:textColor="#CCCCCC"
+            android:textSize="12sp"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <!-- Scanning Animation (Optional) -->
+    <View
+        android:id="@+id/scanningLine"
+        android:layout_width="200dp"
+        android:layout_height="2dp"
+        android:layout_centerInParent="true"
+        android:background="#00FF00"
+        android:alpha="0.8" />
 
 </RelativeLayout>

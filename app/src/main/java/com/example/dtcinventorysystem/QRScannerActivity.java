@@ -22,6 +22,8 @@ import androidx.core.content.ContextCompat;
 import androidx.camera.view.PreviewView;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.barcode.common.Barcode;
@@ -34,7 +36,11 @@ import java.util.concurrent.Executors;
 public class QRScannerActivity extends AppCompatActivity {
     private PreviewView previewView;
     private TextView scanningStatus;
+    private TextView scannedDataDisplay; // New TextView to show scanned data
     private ExecutorService cameraExecutor;
+    private FirebaseAuth mAuth;
+    private boolean isScanning = true;
+    private String lastScannedData = ""; // Store the last scanned data
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +49,19 @@ public class QRScannerActivity extends AppCompatActivity {
 
         previewView = findViewById(R.id.previewView);
         scanningStatus = findViewById(R.id.scanningStatus);
+        scannedDataDisplay = findViewById(R.id.scannedDataDisplay); // Initialize new TextView
 
+        mAuth = FirebaseAuth.getInstance();
+
+        // Check if user is authenticated
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "Please login first", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        // Check camera permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 1001);
@@ -74,62 +92,141 @@ public class QRScannerActivity extends AppCompatActivity {
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
+                runOnUiThread(() -> scanningStatus.setText("Point camera at PC QR code to scan"));
+
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Failed to start camera", Toast.LENGTH_SHORT).show();
+                    scanningStatus.setText("Camera initialization failed");
+                });
             }
         }, ContextCompat.getMainExecutor(this));
     }
 
     @OptIn(markerClass = ExperimentalGetImage.class)
     private void scanBarcode(ImageProxy imageProxy) {
-        if (imageProxy == null || imageProxy.getImage() == null) {
+        if (!isScanning || imageProxy == null || imageProxy.getImage() == null) {
             imageProxy.close();
             return;
         }
 
-        InputImage image = InputImage.fromMediaImage(imageProxy.getImage(), imageProxy.getImageInfo().getRotationDegrees());
+        InputImage image = InputImage.fromMediaImage(
+                imageProxy.getImage(),
+                imageProxy.getImageInfo().getRotationDegrees()
+        );
         BarcodeScanner scanner = BarcodeScanning.getClient();
 
         scanner.process(image)
                 .addOnSuccessListener(barcodes -> {
-                    if (!barcodes.isEmpty()) {
+                    if (!barcodes.isEmpty() && isScanning) {
                         Barcode barcode = barcodes.get(0);
                         String rawValue = barcode.getRawValue();
 
-                        runOnUiThread(() -> {
-                            Toast.makeText(this, "Scanned: " + rawValue, Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(QRScannerActivity.this, PCDetailActivity.class);
-                            intent.putExtra("pc_id", rawValue);
-                            startActivity(intent);
-                            finish();
-                        });
+                        if (rawValue != null && !rawValue.trim().isEmpty() && !rawValue.equals(lastScannedData)) {
+                            lastScannedData = rawValue;
 
-                        imageProxy.close();
-                        scanner.close();
-                    } else {
-                        imageProxy.close();
+                            runOnUiThread(() -> {
+                                // Display the actual scanned data
+                                scanningStatus.setText("✓ QR Code Scanned Successfully!");
+                                scannedDataDisplay.setText("Scanned Data: " + rawValue);
+                                scannedDataDisplay.setVisibility(TextView.VISIBLE);
+
+                                Toast.makeText(this, "Scanned: " + rawValue, Toast.LENGTH_LONG).show();
+                            });
+
+                            // Wait 2 seconds to let user see the scanned data, then proceed
+                            new android.os.Handler().postDelayed(() -> {
+                                if (isScanning) {
+                                    isScanning = false; // Prevent multiple scans
+
+                                    runOnUiThread(() -> {
+                                        // Determine user role and username
+                                        FirebaseUser currentUser = mAuth.getCurrentUser();
+                                        String userRole = "maintainer"; // Default role
+                                        String username = "Unknown User";
+
+                                        if (currentUser != null) {
+                                            username = currentUser.getDisplayName();
+                                            if (username == null || username.isEmpty()) {
+                                                username = currentUser.getEmail();
+                                            }
+
+                                            // Determine role based on email or other logic
+                                            if (currentUser.getEmail() != null && currentUser.getEmail().contains("admin")) {
+                                                userRole = "admin";
+                                            }
+                                        }
+
+                                        // Create intent to return to calling activity or go to PC detail
+                                        Intent resultIntent = new Intent();
+                                        resultIntent.putExtra("pc_id", rawValue.trim());
+                                        resultIntent.putExtra("username", username);
+                                        resultIntent.putExtra("role", userRole);
+                                        resultIntent.putExtra("scan_timestamp", System.currentTimeMillis());
+
+                                        // If this was called for result, return the data
+                                        if (getIntent().hasExtra("return_result") && getIntent().getBooleanExtra("return_result", false)) {
+                                            setResult(RESULT_OK, resultIntent);
+                                            finish();
+                                        } else {
+                                            // Otherwise, launch PC detail activity
+                                            resultIntent.setClass(this, PCDetailActivity.class);
+                                            startActivity(resultIntent);
+                                            finish();
+                                        }
+                                    });
+                                }
+                            }, 2000); // 2 second delay
+                        }
                     }
+                    imageProxy.close();
                 })
                 .addOnFailureListener(e -> {
-                    runOnUiThread(() -> Toast.makeText(this, "Scan failed.", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Scan failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        scanningStatus.setText("Scanning failed, try again");
+                    });
                     imageProxy.close();
+                })
+                .addOnCompleteListener(task -> {
+                    scanner.close();
                 });
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        cameraExecutor.shutdown();
+        isScanning = false;
+        if (cameraExecutor != null) {
+            cameraExecutor.shutdown();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isScanning = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isScanning = true;
+        lastScannedData = ""; // Reset to allow re-scanning same code
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1001 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            startCamera();
-        } else {
-            Toast.makeText(this, "Camera permission is required.", Toast.LENGTH_LONG).show();
-            finish();
+        if (requestCode == 1001) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startCamera();
+            } else {
+                Toast.makeText(this, "Camera permission is required to scan QR codes", Toast.LENGTH_LONG).show();
+                scanningStatus.setText("Camera permission denied");
+                finish();
+            }
         }
     }
 }

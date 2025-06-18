@@ -1,5 +1,9 @@
 [versions]
 agp = "8.5.2"
+cameraCoreVersion = "1.3.0"
+cardview = "1.0.0"
+firebaseAuthVersion = "22.3.1"
+firebaseDatabaseVersion = "20.3.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -13,6 +17,13 @@ firebaseAuth = "23.2.1"
 firebaseDatabase = "21.0.0"
 
 [libraries]
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraCoreVersion" }
+androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraCoreVersion" }
+camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCoreVersion" }
+camera-core-v130 = { module = "androidx.camera:camera-core", version.ref = "cameraCoreVersion" }
+cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
+firebase-auth-v2231 = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuthVersion" }
+firebase-database-v2030 = { module = "com.google.firebase:firebase-database", version.ref = "firebaseDatabaseVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

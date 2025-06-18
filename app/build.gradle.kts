@@ -40,27 +40,30 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
 
+    // CardView for better UI
+    implementation(libs.cardview)
+
     // CameraX
-    implementation("androidx.camera:camera-core:1.3.0")
-    implementation("androidx.camera:camera-camera2:1.3.0")
-    implementation("androidx.camera:camera-lifecycle:1.3.0")
-    implementation("androidx.camera:camera-view:1.3.0")
+    implementation(libs.camera.core.v130)
+    implementation(libs.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
 
     // ML Kit Barcode Scanner
-    implementation("com.google.mlkit:barcode-scanning:17.2.0")
-    implementation("com.google.mlkit:common:18.5.0")
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+    implementation("com.google.mlkit:common:18.11.0")
 
     // Guava for ListenableFuture
-    implementation("com.google.guava:guava:31.1-android")
+    implementation("com.google.guava:guava:32.1.3-android")
 
     // Firebase (optional — include only what you use, like Auth/Database)
-    implementation("com.google.firebase:firebase-auth:22.3.1")
-    implementation("com.google.firebase:firebase-database:20.3.0")
+    implementation(libs.firebase.auth.v2231)
+    implementation(libs.firebase.database.v2030)
 
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation ("com.google.firebase:firebase-auth:23.2.1")
-    implementation ("com.google.firebase:firebase-database:21.0.0")
+    implementation (libs.firebase.auth)
+    implementation (libs.firebase.database)
 }
