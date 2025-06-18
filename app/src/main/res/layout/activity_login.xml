@@ -1,25 +1,138 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="20dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
 
-    <EditText
-        android:id="@+id/email_input"
-        android:hint="Email"
+    <!-- Header Section with Logo and Branding -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp">
 
-    <EditText
-        android:id="@+id/password_input"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <!-- Logo/Branding Image -->
+        <ImageView
+            android:layout_width="280dp"
+            android:layout_height="180dp"
+            android:layout_marginBottom="5dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/dtc_logo" />
 
-    <Button
-        android:id="@+id/login_button"
-        android:text="Login"
+        <!-- Digital Transformation Center Text -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Digital Transformation Center"
+            android:textSize="18sp"
+            android:textColor="#EF5E5E"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Mobile App Inventory Badge -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mobile App Inventory"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/rounded_red_background"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="6dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="150dp"
+        android:layout_weight="1"
+        android:background="@drawable/login_field_background"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Welcome Text -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Welcome back!"
+            android:textColor="#000000"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <!-- Subtitle -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:text="Login to your account to get started."
+            android:textColor="#666666"
+            android:textSize="16sp" />
+
+        <!-- Email Label -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Email"
+            android:textColor="#666666"
+            android:textSize="16sp" />
+
+        <!-- Email Input -->
+        <EditText
+            android:id="@+id/email_input"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/rounded_input_background"
+            android:hint=""
+            android:inputType="textEmailAddress"
+            android:paddingHorizontal="16dp"
+            android:textSize="16sp" />
+
+        <!-- Password Label -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Password"
+            android:textColor="#666666"
+            android:textSize="16sp" />
+
+        <!-- Password Input -->
+        <EditText
+            android:id="@+id/password_input"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/rounded_input_background"
+            android:hint=""
+            android:inputType="textPassword"
+            android:paddingHorizontal="16dp"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/login_button"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="@color/red"
+            android:text="Login"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Forgot Password Link -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Forgot password? Click here"
+            android:textColor="#666666"
+            android:textSize="14sp" />
+
+    </LinearLayout>
 </LinearLayout>
