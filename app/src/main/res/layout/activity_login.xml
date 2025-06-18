@@ -12,7 +12,8 @@
         android:layout_weight="1"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="32dp">
+        android:layout_marginBottom="0dp"
+        android:padding="33dp">
 
         <!-- Logo/Branding Image -->
         <ImageView
@@ -30,18 +31,16 @@
             android:textSize="18sp"
             android:textColor="#EF5E5E"
             android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="5dp" />
 
-        <!-- Mobile App Inventory Badge -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mobile App Inventory"
-            android:textSize="14sp"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/rounded_red_background"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="6dp" />
+            android:text="Inventory Management System"
+            android:textSize="15sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
 
     </LinearLayout>
 
@@ -133,6 +132,5 @@
             android:text="Forgot password? Click here"
             android:textColor="#666666"
             android:textSize="14sp" />
-
     </LinearLayout>
 </LinearLayout>
