@@ -59,6 +59,7 @@ dependencies {
     // Firebase (optional — include only what you use, like Auth/Database)
     implementation(libs.firebase.auth.v2231)
     implementation(libs.firebase.database.v2030)
+    implementation(libs.firebase.firestore)
 
     // Testing
     testImplementation(libs.junit)

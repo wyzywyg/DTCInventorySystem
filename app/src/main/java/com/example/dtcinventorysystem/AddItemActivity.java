@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Size;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
@@ -35,10 +36,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class QRScannerActivity extends AppCompatActivity {
+public class AddItemActivity extends AppCompatActivity {
     private PreviewView previewView;
     private TextView scanningStatus;
     private TextView scannedDataDisplay;
+    private TextView instructionText;
+    private Button backButton;
     private ExecutorService cameraExecutor;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -48,14 +51,10 @@ public class QRScannerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_qrscanner);
+        setContentView(R.layout.activity_add_item);
 
-        previewView = findViewById(R.id.previewView);
-        scanningStatus = findViewById(R.id.scanningStatus);
-        scannedDataDisplay = findViewById(R.id.scannedDataDisplay);
-
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        initializeViews();
+        initializeFirebase();
 
         // Check if user is authenticated
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -64,6 +63,8 @@ public class QRScannerActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        setupBackButton();
 
         // Check camera permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -74,6 +75,32 @@ public class QRScannerActivity extends AppCompatActivity {
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor();
+    }
+
+    private void initializeViews() {
+        previewView = findViewById(R.id.previewView);
+        scanningStatus = findViewById(R.id.scanningStatus);
+        scannedDataDisplay = findViewById(R.id.scannedDataDisplay);
+        instructionText = findViewById(R.id.instructionText); // Make sure this exists in your layout
+
+
+        // Set initial instruction text
+        if (instructionText != null) {
+            instructionText.setText("Scan QR Code to Add New Item");
+        }
+    }
+
+    private void initializeFirebase() {
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+    }
+
+    private void setupBackButton() {
+        if (backButton != null) {
+            backButton.setOnClickListener(v -> {
+                finish(); // Go back to previous activity
+            });
+        }
     }
 
     private void startCamera() {
@@ -97,7 +124,7 @@ public class QRScannerActivity extends AppCompatActivity {
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
-                runOnUiThread(() -> scanningStatus.setText("Point camera at PC QR code to scan"));
+                runOnUiThread(() -> scanningStatus.setText("Point camera at PC QR code to add new item"));
 
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
@@ -133,13 +160,13 @@ public class QRScannerActivity extends AppCompatActivity {
                             isScanning = false; // Stop further scanning
 
                             runOnUiThread(() -> {
-                                scanningStatus.setText("✓ QR Code Detected - Checking Database...");
+                                scanningStatus.setText("✓ QR Code Detected - Checking if item exists...");
                                 scannedDataDisplay.setText("Scanned: " + rawValue);
                                 scannedDataDisplay.setVisibility(TextView.VISIBLE);
                             });
 
-                            // Check database for the scanned PC ID
-                            checkPCInDatabase(rawValue.trim());
+                            // Check if PC already exists in database
+                            checkPCExistence(rawValue.trim());
                         }
                     }
                     imageProxy.close();
@@ -156,8 +183,8 @@ public class QRScannerActivity extends AppCompatActivity {
                 });
     }
 
-    private void checkPCInDatabase(String pcId) {
-        runOnUiThread(() -> scanningStatus.setText("🔍 Searching database..."));
+    private void checkPCExistence(String pcId) {
+        runOnUiThread(() -> scanningStatus.setText("🔍 Checking if item already exists..."));
 
         db.collection("articles").document(pcId)
                 .get()
@@ -165,20 +192,20 @@ public class QRScannerActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            // PC found in database
+                            // PC already exists in database
                             runOnUiThread(() -> {
-                                scanningStatus.setText("✅ PC Record Found!");
-                                Toast.makeText(this, "PC found: " + pcId, Toast.LENGTH_SHORT).show();
+                                scanningStatus.setText("❌ Item Already Exists");
+                                showItemExistsDialog(pcId);
+                            });
+                        } else {
+                            // PC doesn't exist - proceed to add new item
+                            runOnUiThread(() -> {
+                                scanningStatus.setText("✅ Ready to Add New Item");
+                                Toast.makeText(this, "Proceeding to add new item: " + pcId, Toast.LENGTH_SHORT).show();
                             });
 
-                            // Navigate to PC detail with data
-                            navigateToPCDetail(pcId, document);
-                        } else {
-                            // PC not found - show "No Record" popup
-                            runOnUiThread(() -> {
-                                scanningStatus.setText("❌ No Record Found");
-                                showNoRecordDialog(pcId);
-                            });
+                            // Navigate to PC detail in add mode
+                            navigateToAddNewItem(pcId);
                         }
                     } else {
                         // Database error
@@ -187,79 +214,68 @@ public class QRScannerActivity extends AppCompatActivity {
                             Toast.makeText(this, "Error checking database: " + task.getException().getMessage(),
                                     Toast.LENGTH_LONG).show();
                             // Reset scanning after error
-                            new android.os.Handler().postDelayed(() -> {
-                                isScanning = true;
-                                lastScannedData = "";
-                                scanningStatus.setText("Point camera at PC QR code to scan");
-                                scannedDataDisplay.setVisibility(TextView.GONE);
-                            }, 2000);
+                            resetScanning();
                         });
                     }
                 });
     }
 
-    private void showNoRecordDialog(String pcId) {
+    private void showItemExistsDialog(String pcId) {
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        builder.setTitle("No Record Found")
-                .setMessage("The scanned QR code '" + pcId + "' is not found in the database.\n\nWould you like to add this item?")
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton("Add Item", (dialog, which) -> {
-                    // Navigate to AddItemActivity instead of PCDetailActivity
-                    Intent intent = new Intent(this, AddItemActivity.class);
+        builder.setTitle("Item Already Exists")
+                .setMessage("The scanned QR code '" + pcId + "' already exists in the database.\n\nWould you like to view the existing item or scan a different QR code?")
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setPositiveButton("View Existing", (dialog, which) -> {
+                    // Navigate to view existing item
+                    Intent intent = new Intent(this, PCDetailActivity.class);
+                    intent.putExtra("pc_id", pcId);
+                    intent.putExtra("mode", "view_existing");
+                    intent.putExtra("username", getCurrentUsername());
+                    intent.putExtra("user_role", getCurrentUserRole());
                     startActivity(intent);
                     finish();
                 })
-                .setNegativeButton("Scan Again", (dialog, which) -> {
-                    // Reset scanning
-                    isScanning = true;
-                    lastScannedData = "";
-                    runOnUiThread(() -> {
-                        scanningStatus.setText("Point camera at PC QR code to scan");
-                        scannedDataDisplay.setVisibility(TextView.GONE);
-                    });
+                .setNegativeButton("Scan Different", (dialog, which) -> {
+                    // Reset scanning for different QR code
+                    resetScanning();
+                })
+                .setNeutralButton("Cancel", (dialog, which) -> {
+                    finish(); // Go back to previous activity
                 })
                 .setCancelable(false)
                 .show();
     }
 
-    private void navigateToPCDetail(String pcId, DocumentSnapshot document) {
+    private void navigateToAddNewItem(String pcId) {
         // Small delay to show success message
         new android.os.Handler().postDelayed(() -> {
             Intent intent = new Intent(this, PCDetailActivity.class);
 
-            // Pass PC ID and mode
+            // Pass PC ID and mode for adding new item
             intent.putExtra("pc_id", pcId);
-            intent.putExtra("mode", "view_existing");
+            intent.putExtra("mode", "add_new");
 
             // Pass user info
             intent.putExtra("username", getCurrentUsername());
             intent.putExtra("user_role", getCurrentUserRole());
 
-            // Pass PC data from Firestore
-            if (document.contains("Amount")) {
-                intent.putExtra("amount", document.getString("Amount"));
-            }
-            if (document.contains("Article")) {
-                intent.putExtra("article", document.getString("Article"));
-            }
-            if (document.contains("Date Acquired")) {
-                intent.putExtra("date_acquired", document.getString("Date Acquired"));
-            }
-            if (document.contains("End User")) {
-                intent.putExtra("end_user", document.getString("End User"));
-            }
-            if (document.contains("Property Number")) {
-                intent.putExtra("property_number", document.getString("Property Number"));
-            }
-            if (document.contains("Specifications")) {
-                intent.putExtra("specifications", document.getString("Specifications"));
-            }
-
+            // Pass scan timestamp
             intent.putExtra("scan_timestamp", System.currentTimeMillis());
 
             startActivity(intent);
             finish();
         }, 1000);
+    }
+
+    private void resetScanning() {
+        new android.os.Handler().postDelayed(() -> {
+            isScanning = true;
+            lastScannedData = "";
+            runOnUiThread(() -> {
+                scanningStatus.setText("Point camera at PC QR code to add new item");
+                scannedDataDisplay.setVisibility(TextView.GONE);
+            });
+        }, 2000);
     }
 
     private String getCurrentUsername() {
@@ -310,7 +326,7 @@ public class QRScannerActivity extends AppCompatActivity {
             isScanning = true;
             lastScannedData = "";
             runOnUiThread(() -> {
-                scanningStatus.setText("Point camera at PC QR code to scan");
+                scanningStatus.setText("Point camera at PC QR code to add new item");
                 scannedDataDisplay.setVisibility(TextView.GONE);
             });
         }

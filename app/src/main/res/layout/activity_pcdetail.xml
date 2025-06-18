@@ -20,8 +20,7 @@
             android:layout_marginBottom="16dp"
             android:elevation="4dp"
             app:cardCornerRadius="8dp"
-            app:cardBackgroundColor="#ffffff"
-            xmlns:app="http://schemas.android.com/apk/res-auto">
+            app:cardBackgroundColor="#ffffff">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -50,20 +49,20 @@
                     android:gravity="center"
                     android:layout_marginBottom="4dp" />
 
-                <!-- Keyboard Label -->
+                <!-- Article Type Label -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Keyboard"
+                    android:text="Desktop Computer"
                     android:textSize="12sp"
                     android:gravity="center"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="16dp" />
 
-                <!-- PC Name -->
+                <!-- Property Number -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Prop No:"
+                    android:text="Property Number:"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -73,7 +72,8 @@
                     android:layout_height="wrap_content"
                     android:hint="Enter property number"
                     android:textSize="12sp"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="12dp"
+                    android:enabled="false" />
 
                 <!-- PC Specs -->
                 <TextView
@@ -89,7 +89,9 @@
                     android:layout_height="wrap_content"
                     android:hint="Enter specifications"
                     android:textSize="12sp"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="12dp"
+                    android:minLines="2"
+                    android:enabled="false" />
 
                 <!-- Date Acquired -->
                 <TextView
@@ -107,7 +109,43 @@
                     android:focusable="false"
                     android:clickable="true"
                     android:textSize="12sp"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="12dp"
+                    android:enabled="false" />
+
+                <!-- End User -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="End User:"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/end_user_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter end user"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="12dp"
+                    android:enabled="false" />
+
+                <!-- Amount -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Amount:"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/amount_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter amount"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="12dp"
+                    android:inputType="numberDecimal"
+                    android:enabled="false" />
 
                 <!-- Last Maintenance Date -->
                 <TextView
@@ -121,9 +159,10 @@
                     android:id="@+id/last_maintained_display"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Jun 17, 2025"
+                    android:text="Not maintained yet"
                     android:textSize="12sp"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="8dp"
+                    android:textColor="#666666" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -147,24 +186,27 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Maintenance Task"
+                    android:text="Maintenance Tasks"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:gravity="center"
-                    android:layout_marginBottom="16dp" />
+                    android:layout_marginBottom="16dp"
+                    android:textColor="#333333" />
 
                 <!-- Virus Check -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="12dp"
+                    android:padding="8dp"
+                    android:background="?android:attr/selectableItemBackground">
 
                     <ImageView
                         android:id="@+id/virus_check_icon"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_check_circle"
+                        android:src="@drawable/ic_close_circle"
                         android:layout_marginEnd="12dp"
                         android:layout_gravity="center_vertical" />
 
@@ -172,7 +214,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Performed anti virus check up"
+                        android:text="Performed anti-virus check up"
                         android:textSize="14sp"
                         android:layout_gravity="center_vertical" />
 
@@ -180,7 +222,7 @@
                         android:id="@+id/checkbox_virus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="true" />
+                        android:enabled="false" />
 
                 </LinearLayout>
 
@@ -189,7 +231,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="12dp"
+                    android:padding="8dp"
+                    android:background="?android:attr/selectableItemBackground">
 
                     <ImageView
                         android:id="@+id/uninstall_icon"
@@ -210,7 +254,8 @@
                     <CheckBox
                         android:id="@+id/checkbox_uninstall"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:enabled="false" />
 
                 </LinearLayout>
 
@@ -219,13 +264,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="16dp"
+                    android:padding="8dp"
+                    android:background="?android:attr/selectableItemBackground">
 
                     <ImageView
                         android:id="@+id/update_icon"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_update_circle"
+                        android:src="@drawable/ic_close_circle"
                         android:layout_marginEnd="12dp"
                         android:layout_gravity="center_vertical" />
 
@@ -240,26 +287,36 @@
                     <CheckBox
                         android:id="@+id/checkbox_update"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:enabled="false" />
 
                 </LinearLayout>
+
+                <!-- Maintenance Info Section -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#eeeeee"
+                    android:layout_marginVertical="8dp" />
 
                 <!-- Performed By -->
                 <TextView
                     android:id="@+id/performed_by_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Performed by: Maintainer245"
+                    android:text="Performed by: Not assigned"
                     android:textSize="12sp"
-                    android:layout_marginBottom="4dp" />
+                    android:layout_marginBottom="4dp"
+                    android:textColor="#666666" />
 
                 <!-- Date -->
                 <TextView
                     android:id="@+id/maintenance_date_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Date: Jun 20, 2025"
-                    android:textSize="12sp" />
+                    android:text="Date: Not performed"
+                    android:textSize="12sp"
+                    android:textColor="#666666" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -269,17 +326,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="16dp">
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/enable_edit_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Enable Edit"
+                android:backgroundTint="#2196F3"
+                android:textColor="#ffffff"
+                android:layout_marginEnd="4dp" />
 
             <Button
                 android:id="@+id/update_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Update"
+                android:text="Update Maintenance"
                 android:backgroundTint="#4CAF50"
                 android:textColor="#ffffff"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginHorizontal="4dp" />
 
             <Button
                 android:id="@+id/add_new_item_btn"
@@ -289,51 +356,81 @@
                 android:text="Add New Item"
                 android:backgroundTint="#FF5722"
                 android:textColor="#ffffff"
-                android:layout_marginStart="8dp" />
+                android:layout_marginStart="4dp"
+                android:visibility="gone" />
 
         </LinearLayout>
 
-        <!-- Status Information -->
-        <LinearLayout
+        <!-- Status Information Card -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="16dp">
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="#ffffff">
 
-            <!-- Status -->
-            <TextView
-                android:id="@+id/status_text"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Status: Maintained"
-                android:textStyle="bold"
-                android:layout_marginBottom="4dp" />
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <!-- Last Updated -->
-            <TextView
-                android:id="@+id/last_updated_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Last Updated: Jun 20, 2025"
-                android:layout_marginBottom="4dp" />
+                <!-- Status Card Title -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="System Status"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp"
+                    android:textColor="#333333" />
 
-            <!-- Maintainer -->
-            <TextView
-                android:id="@+id/maintainer_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Last maintained by: Maintainer245"
-                android:layout_marginBottom="8dp" />
+                <!-- Status -->
+                <TextView
+                    android:id="@+id/status_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Status: Partial Maintenance"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="#FF9800" />
 
-            <!-- Diagnostics -->
-            <TextView
-                android:id="@+id/diagnostics_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Diagnostics: All systems operational"
-                android:textColor="#333333" />
+                <!-- Last Updated -->
+                <TextView
+                    android:id="@+id/last_updated_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Last Updated: Not updated"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="4dp"
+                    android:textColor="#666666" />
 
-        </LinearLayout>
+                <!-- Maintainer -->
+                <TextView
+                    android:id="@+id/maintainer_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Last maintained by: Not maintained"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="#666666" />
+
+                <!-- Diagnostics -->
+                <TextView
+                    android:id="@+id/diagnostics_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Diagnostics: Some maintenance tasks pending"
+                    android:textSize="12sp"
+                    android:textColor="#666666"
+                    android:background="#f8f8f8"
+                    android:padding="8dp" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 </ScrollView>
