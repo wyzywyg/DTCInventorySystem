@@ -1,55 +1,126 @@
 package com.example.dtcinventorysystem;
 
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
 public class DashboardActivity extends AppCompatActivity {
-    ListView pcListView;
-    DatabaseReference pcRef;
-    ArrayAdapter<String> adapter;
-    ArrayList<String> pcSummaries = new ArrayList<>();
+
+    private TextView greetingText, itemCountText, lastUpdatedText;
+    private TextView recentlyAddedText, categoryText, lastScanText, locationText;
+    private TextView recentlyAddedUpdate, categoryUpdate, lastScanUpdate, locationUpdate;
+
+    private String currentUser = "Maintainer245";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        pcListView = findViewById(R.id.pc_list);
-        pcRef = FirebaseDatabase.getInstance().getReference("pcs");
+        greetingText = findViewById(R.id.greetingText);
+        itemCountText = findViewById(R.id.itemCountText);
+        lastUpdatedText = findViewById(R.id.lastUpdatedText);
 
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, pcSummaries);
-        pcListView.setAdapter(adapter);
+        // Recently Added Card
+        View recentlyAddedCard = findViewById(R.id.recentlyAddedCard);
+        recentlyAddedText = recentlyAddedCard.findViewById(R.id.statValue);
+        TextView recentlyAddedTitle = recentlyAddedCard.findViewById(R.id.statTitle);
+        recentlyAddedUpdate = recentlyAddedCard.findViewById(R.id.statUpdate);
+        recentlyAddedTitle.setText("Recently Added");
 
-        pcRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                pcSummaries.clear();
-                for (DataSnapshot pcSnap : snapshot.getChildren()) {
-                    String pcId = pcSnap.getKey();
-                    Boolean virus = pcSnap.child("virusCheck").getValue(Boolean.class);
-                    Boolean update = pcSnap.child("updateSoftware").getValue(Boolean.class);
-                    pcSummaries.add(pcId + ": Virus Check - " + virus + ", Updated - " + update);
+        // Categories Card
+        View categoryCard = findViewById(R.id.categoryCard);
+        categoryText = categoryCard.findViewById(R.id.statValue);
+        TextView categoryTitle = categoryCard.findViewById(R.id.statTitle);
+        categoryUpdate = categoryCard.findViewById(R.id.statUpdate);
+        categoryTitle.setText("Categories");
+
+        // Last Scan Card
+        View lastScanCard = findViewById(R.id.lastScanCard);
+        lastScanText = lastScanCard.findViewById(R.id.statValue);
+        TextView lastScanTitle = lastScanCard.findViewById(R.id.statTitle);
+        lastScanUpdate = lastScanCard.findViewById(R.id.statUpdate);
+        lastScanTitle.setText("Scanned Today");
+
+        // Location Card
+        View locationCard = findViewById(R.id.locationCard);
+        locationText = locationCard.findViewById(R.id.statValue);
+        TextView locationTitle = locationCard.findViewById(R.id.statTitle);
+        locationUpdate = locationCard.findViewById(R.id.statUpdate);
+        locationTitle.setText("Locations");
+
+        greetingText.setText("Hello! " + currentUser + " 👋");
+
+        fetchDashboardData();
+    }
+
+    private void fetchDashboardData() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        CollectionReference articlesRef = db.collection("articles");
+        CollectionReference maintenanceRef = db.collection("maintenance");
+
+        String today = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(new Date());
+        String updatedText = "Updated: " + new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(new Date());
+
+        // Fetch articles
+        articlesRef.get().addOnSuccessListener(articleSnapshots -> {
+            recentlyAddedUpdate.setText(updatedText);
+            categoryUpdate.setText(updatedText);
+            locationUpdate.setText(updatedText);
+
+            int totalItems = articleSnapshots.size();
+            int recentlyAdded = 0;
+            Set<String> categories = new HashSet<>();
+
+            for (QueryDocumentSnapshot doc : articleSnapshots) {
+                String dateAcquired = doc.getString("Date Acquired");
+                if (today.equals(dateAcquired)) {
+                    recentlyAdded++;
                 }
-                adapter.notifyDataSetChanged();
+
+                String category = doc.getString("Article");
+                if (category != null) {
+                    categories.add(category);
+                }
             }
 
-            @Override
-            public void onCancelled(DatabaseError error) {}
+            itemCountText.setText(String.valueOf(totalItems));
+            recentlyAddedText.setText(String.valueOf(recentlyAdded));
+            categoryText.setText("7");
+            locationText.setText("5"); // Static for now
+
+            lastUpdatedText.setText(updatedText);
+        });
+
+        // Fetch maintenance data
+        maintenanceRef.get().addOnSuccessListener(maintenanceSnapshots -> {
+            lastScanUpdate.setText(updatedText);
+
+            int scanToday = 0;
+            for (QueryDocumentSnapshot doc : maintenanceSnapshots) {
+                String lastScan = doc.getString("last_maintenance_date");
+                if (today.equals(lastScan)) {
+                    scanToday++;
+                }
+            }
+
+            lastScanText.setText(String.valueOf(scanToday));
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Error loading maintenance data", Toast.LENGTH_SHORT).show();
         });
     }
 }
