@@ -204,8 +204,12 @@ public class QRScannerActivity extends AppCompatActivity {
                 .setMessage("The scanned QR code '" + pcId + "' is not found in the database.\n\nWould you like to add this item?")
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton("Add Item", (dialog, which) -> {
-                    // Navigate to AddItemActivity instead of PCDetailActivity
+                    // Navigate to AddItemActivity and pass pcId + mode + user info
                     Intent intent = new Intent(this, AddItemActivity.class);
+                    intent.putExtra("pc_id", pcId);
+                    intent.putExtra("mode", "add_new");
+                    intent.putExtra("username", getCurrentUsername());
+                    intent.putExtra("user_role", getCurrentUserRole());
                     startActivity(intent);
                     finish();
                 })
@@ -221,6 +225,7 @@ public class QRScannerActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .show();
     }
+
 
     private void navigateToPCDetail(String pcId, DocumentSnapshot document) {
         // Small delay to show success message
