@@ -1,91 +1,340 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:padding="16dp"
+    android:background="#f5f5f5">
 
-    <!-- Camera Preview -->
-    <androidx.camera.view.PreviewView
-        android:id="@+id/previewView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!-- Overlay with scanning frame -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!-- Top Status Bar -->
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <!-- Instruction Text -->
-        <TextView
-            android:id="@+id/instructionText"
+        <!-- PC Card -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Scan QR Code to Add New Item"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="#ffffff">
 
-        <TextView
-            android:id="@+id/scanningStatus"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- PC Image Placeholder -->
+                <ImageView
+                    android:id="@+id/pc_image"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center"
+                    android:background="#cccccc"
+                    android:src="@drawable/ic_computer"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- PC ID -->
+                <TextView
+                    android:id="@+id/pc_id_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ICTCE-PC-00258"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_marginBottom="4dp" />
+
+                <!-- Article Type Label -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Desktop Computer"
+                    android:textSize="12sp"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Property Number -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Property Number:"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/pc_name_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter property number"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="12dp"
+                    android:enabled="false" />
+
+                <!-- PC Specs -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Specifications:"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/pc_specs_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter specifications"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="12dp"
+                    android:minLines="2"
+                    android:enabled="false" />
+
+                <!-- Date Acquired -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Date Acquired:"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/date_acquired_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Select date"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="12dp"
+                    android:enabled="false" />
+
+                <!-- End User -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="End User:"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/end_user_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter end user"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="12dp"
+                    android:enabled="false" />
+
+                <!-- Amount -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Amount:"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/amount_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter amount"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="12dp"
+                    android:inputType="numberDecimal"
+                    android:enabled="false" />
+
+                <!-- Last Maintenance Date -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Last Maintenance Date:"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/last_maintained_display"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Not maintained yet"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="#666666" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Maintenance Task Card -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Point camera at PC QR code to add new item"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:gravity="center" />
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="#ffffff">
 
-        <!-- Scanned Data Display -->
-        <TextView
-            android:id="@+id/scannedDataDisplay"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Maintenance Task Title -->
+
+                <!-- Virus Check -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp"
+                    android:padding="8dp"
+                    android:background="?android:attr/selectableItemBackground">
+
+                    <ImageView
+                        android:id="@+id/virus_check_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_close_circle"
+                        android:layout_marginEnd="12dp"
+                        android:layout_gravity="center_vertical" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Performed anti-virus check up"
+                        android:textSize="14sp"
+                        android:layout_gravity="center_vertical" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_virus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:enabled="false" />
+
+                </LinearLayout>
+
+                <!-- Uninstall Programs -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp"
+                    android:padding="8dp"
+                    android:background="?android:attr/selectableItemBackground">
+
+                    <ImageView
+                        android:id="@+id/uninstall_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_close_circle"
+                        android:layout_marginEnd="12dp"
+                        android:layout_gravity="center_vertical" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Uninstalled unused programs"
+                        android:textSize="14sp"
+                        android:layout_gravity="center_vertical" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_uninstall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:enabled="false" />
+
+                </LinearLayout>
+
+                <!-- Update Software -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp"
+                    android:padding="8dp"
+                    android:background="?android:attr/selectableItemBackground">
+
+                    <ImageView
+                        android:id="@+id/update_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_close_circle"
+                        android:layout_marginEnd="12dp"
+                        android:layout_gravity="center_vertical" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Updated software"
+                        android:textSize="14sp"
+                        android:layout_gravity="center_vertical" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_update"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:enabled="false" />
+
+                </LinearLayout>
+
+                <!-- Maintenance Info Section -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#eeeeee"
+                    android:layout_marginVertical="8dp" />
+
+                <!-- Performed By -->
+
+                <!-- Date -->
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Action Buttons -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:padding="12dp"
-            android:text=""
-            android:textColor="#00FF00"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:visibility="gone" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/save_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Save"
+                android:backgroundTint="#2196F3"
+                android:textColor="#ffffff"
+                android:layout_marginEnd="4dp" />
+
+            <Button
+                android:id="@+id/add_new_item_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Add New Item"
+                android:backgroundTint="#FF5722"
+                android:textColor="#ffffff"
+                android:layout_marginStart="4dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- Status Information Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="#ffffff"/>
 
     </LinearLayout>
-
-    <!-- Bottom Instructions and Back Button -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="🔍 Keep steady until scan completes"
-            android:textColor="#CCCCCC"
-            android:textSize="12sp"
-            android:gravity="center" />
-
-    </LinearLayout>
-
-    <!-- Scanning Animation (Optional) -->
-    <View
-        android:id="@+id/scanningLine"
-        android:layout_width="200dp"
-        android:layout_height="2dp"
-        android:layout_centerInParent="true"
-        android:background="#00FF00"
-        android:alpha="0.8" />
-
-</RelativeLayout>
+</ScrollView>

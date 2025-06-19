@@ -329,35 +329,14 @@
             android:layout_marginBottom="16dp">
 
             <Button
-                android:id="@+id/enable_edit_btn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Enable Edit"
-                android:backgroundTint="#2196F3"
-                android:textColor="#ffffff"
-                android:layout_marginEnd="4dp" />
-
-            <Button
                 android:id="@+id/update_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Update Maintenance"
+                android:text="Update"
                 android:backgroundTint="#4CAF50"
                 android:textColor="#ffffff"
                 android:layout_marginHorizontal="4dp" />
-
-            <Button
-                android:id="@+id/add_new_item_btn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Add New Item"
-                android:backgroundTint="#FF5722"
-                android:textColor="#ffffff"
-                android:layout_marginStart="4dp"
-                android:visibility="gone" />
 
         </LinearLayout>
 
